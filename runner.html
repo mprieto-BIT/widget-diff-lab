@@ -5,16 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Widget Runner</title>
     <style>
-      html, body { margin: 0; padding: 0; background: #fff; }
-      .wrap { padding: 16px; }
-      .meta {
-        font: 12px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-        color: #666;
-        margin-bottom: 10px;
-      }
-      .meta b { color: #222; }
-      .divider { height: 1px; background: #eee; margin: 10px 0 16px 0; }
-    </style>
+     html, body { margin: 0; padding: 0; background: #fff; }
+     .wrap { padding: 16px; }
+     .meta {
+       font: 12px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+       color: #666;
+       margin-bottom: 10px;
+     }
+     .meta b { color: #222; }
+     .divider { height: 1px; background: #eee; margin: 10px 0 16px 0; }
+
+      /* Layout helpers (Option A wrappers) */
+     .case-two-col {
+       display: grid;
+       grid-template-columns: 420px 1fr;
+       gap: 32px;
+       align-items: start;
+     }
+     .case-left { min-width: 0; }
+     .case-right { min-width: 0; }
+     .case-poster { width: 100%; height: auto; display: block; }
+
+     @media (max-width: 900px) {
+       .case-two-col { grid-template-columns: 1fr; }
+     }
+  </style>
   </head>
   <body>
     <div class="wrap">
@@ -24,74 +39,130 @@
     </div>
 
     <script>
-      function qs(name) {
-        return new URLSearchParams(location.search).get(name) || "";
+  function qs(name) {
+    return new URLSearchParams(location.search).get(name) || "";
+  }
+
+  function setMeta(text) {
+    document.getElementById("meta").innerHTML = text;
+  }
+
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const s = document.createElement("script");
+      s.charset = "utf-8";
+      s.src = src;
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+
+  function addCssLinks(links) {
+    (links || []).forEach((href) => {
+      if (!href) return;
+      const l = document.createElement("link");
+      l.rel = "stylesheet";
+      l.href = href;
+      document.head.appendChild(l);
+    });
+  }
+
+  function addInlineCss(cssText) {
+    if (!cssText) return;
+    const s = document.createElement("style");
+    s.textContent = cssText;
+    document.head.appendChild(s);
+  }
+
+  function createInitializer(attrs) {
+    const a = document.createElement("a");
+    a.className = "bit-widget-initializer";
+    Object.entries(attrs || {}).forEach(([k, v]) => {
+      if (v === null || v === undefined) return;
+      a.setAttribute(k, String(v));
+    });
+    return a;
+  }
+
+  function renderLayout(found) {
+    const mount = document.getElementById("mount");
+    mount.innerHTML = "";
+
+    const layout = (found.layout || "plain").toLowerCase();
+
+    if (layout === "twocolumnposter") {
+      const wrap = document.createElement("div");
+      wrap.className = "case-two-col";
+
+      const left = document.createElement("div");
+      left.className = "case-left";
+
+      if (found.posterUrl) {
+        const img = document.createElement("img");
+        img.className = "case-poster";
+        img.alt = (found.label || "Poster") + " poster";
+        img.src = found.posterUrl;
+        left.appendChild(img);
       }
 
-      function setMeta(text) {
-        document.getElementById("meta").innerHTML = text;
-      }
+      const right = document.createElement("div");
+      right.className = "case-right";
+      right.appendChild(createInitializer(found.attrs));
 
-      function loadScript(src) {
-        return new Promise((resolve, reject) => {
-          const s = document.createElement("script");
-          s.charset = "utf-8";
-          s.src = src;
-          s.onload = resolve;
-          s.onerror = reject;
-          document.head.appendChild(s);
-        });
-      }
+      wrap.appendChild(left);
+      wrap.appendChild(right);
+      mount.appendChild(wrap);
+      return;
+    }
 
-      function createInitializer(attrs) {
-        const a = document.createElement("a");
-        a.className = "bit-widget-initializer";
-        Object.entries(attrs || {}).forEach(([k, v]) => {
-          if (v === null || v === undefined) return;
-          a.setAttribute(k, String(v));
-        });
-        return a;
-      }
+    // default
+    mount.appendChild(createInitializer(found.attrs));
+  }
 
-      async function main() {
-        const env = (qs("env") || "prod").toLowerCase();
-        const key = qs("case") || "jeffallencomedy";
+  async function main() {
+    const env = (qs("env") || "prod").toLowerCase();
+    const key = qs("case") || "jeffallencomedy";
 
-        const scriptSrc =
-          env === "stg"
-            ? "https://widgetv3.stg.bandsintown.com/main.min.js"
-            : "https://widgetv3.bandsintown.com/main.min.js";
+    const scriptSrc =
+      env === "stg"
+        ? "https://widgetv3.stg.bandsintown.com/main.min.js"
+        : "https://widgetv3.bandsintown.com/main.min.js";
 
-        const idxRes = await fetch("./cases/index.json", { cache: "no-store" });
-        const idx = await idxRes.json();
-        const entry = (idx.cases || []).find((c) => c.key === key);
+    // Load index, then the case file (Step 6 structure)
+    const idxRes = await fetch("./cases/index.json", { cache: "no-store" });
+    const idx = await idxRes.json();
+    const entry = (idx.cases || []).find((c) => c.key === key);
 
-        if (!entry || !entry.file) {
-        setMeta(`Missing case entry: <b>${key}</b>`);
-        return;
-        }
+    if (!entry || !entry.file) {
+      setMeta(`Missing case entry: <b>${key}</b>`);
+      return;
+    }
 
-        const caseRes = await fetch("./" + entry.file, { cache: "no-store" });
-        const found = await caseRes.json();
+    const caseRes = await fetch("./" + entry.file, { cache: "no-store" });
+    const found = await caseRes.json();
 
-        if (!found) {
-          setMeta(`Missing case: <b>${key}</b>`);
-          return;
-        }
+    // Apply case-level page styling
+    if (found.bodyId) document.body.id = found.bodyId;
+    if (found.bodyClass) document.body.className = found.bodyClass;
 
-        setMeta(
-          `Env: <b>${env.toUpperCase()}</b>. Case: <b>${found.label}</b>. Site: <b>${found.site}</b>`
-        );
+    addCssLinks(found.cssLinks);
+    addInlineCss(found.inlineCss);
 
-        const mount = document.getElementById("mount");
-        mount.appendChild(createInitializer(found.attrs));
+    setMeta(
+      `Env: <b>${env.toUpperCase()}</b>. Case: <b>${found.label}</b>. Site: <b>${found.site}</b>`
+    );
 
-        await loadScript(scriptSrc);
-      }
+    renderLayout(found);
 
-      main().catch((e) => {
-        setMeta(`Runner error: <b>${String(e && e.message ? e.message : e)}</b>`);
-      });
-    </script>
+    // Load widget script last
+    await loadScript(scriptSrc);
+  }
+
+  main().catch((e) => {
+    setMeta(`Runner error: <b>${String(e && e.message ? e.message : e)}</b>`);
+  });
+</script>
+    
   </body>
 </html>
