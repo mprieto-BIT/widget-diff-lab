@@ -1,1 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Widget Runner</title>
+    <style>
+      html, body { margin: 0; padding: 0; background: #fff; }
+      .wrap { padding: 16px; }
+      .meta {
+        font: 12px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        color: #666;
+        margin-bottom: 10px;
+      }
+      .meta b { color: #222; }
+      .divider { height: 1px; background: #eee; margin: 10px 0 16px 0; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="meta" id="meta"></div>
+      <div class="divider"></div>
+      <div id="mount"></div>
+    </div>
 
+    <script>
+      function qs(name) {
+        return new URLSearchParams(location.search).get(name) || "";
+      }
+
+      function setMeta(text) {
+        document.getElementById("meta").innerHTML = text;
+      }
+
+      function loadScript(src) {
+        return new Promise((resolve, reject) => {
+          const s = document.createElement("script");
+          s.charset = "utf-8";
+          s.src = src;
+          s.onload = resolve;
+          s.onerror = reject;
+          document.head.appendChild(s);
+        });
+      }
+
+      function createInitializer(attrs) {
+        const a = document.createElement("a");
+        a.className = "bit-widget-initializer";
+        Object.entries(attrs || {}).forEach(([k, v]) => {
+          if (v === null || v === undefined) return;
+          a.setAttribute(k, String(v));
+        });
+        return a;
+      }
+
+      async function main() {
+        const env = (qs("env") || "prod").toLowerCase();
+        const key = qs("case") || "jeffallencomedy";
+
+        const scriptSrc =
+          env === "stg"
+            ? "https://widgetv3.stg.bandsintown.com/main.min.js"
+            : "https://widgetv3.bandsintown.com/main.min.js";
+
+        const res = await fetch("./cases.json", { cache: "no-store" });
+        const cases = await res.json();
+        const found = cases.find((c) => c.key === key);
+
+        if (!found) {
+          setMeta(`Missing case: <b>${key}</b>`);
+          return;
+        }
+
+        setMeta(
+          `Env: <b>${env.toUpperCase()}</b>. Case: <b>${found.label}</b>. Site: <b>${found.site}</b>`
+        );
+
+        const mount = document.getElementById("mount");
+        mount.appendChild(createInitializer(found.attrs));
+
+        await loadScript(scriptSrc);
+      }
+
+      main().catch((e) => {
+        setMeta(`Runner error: <b>${String(e && e.message ? e.message : e)}</b>`);
+      });
+    </script>
+  </body>
+</html>
