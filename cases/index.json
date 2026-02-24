@@ -9,11 +9,6 @@
       "key": "gorillaz",
       "label": "Gorillaz Tour",
       "file": "cases/gorillaz.json"
-    },
-    {
-      "key": "teddyswims",
-      "label": "Teddy Swims Tour",
-      "file": "cases/teddyswims.json" 
     }
   ]
 }
