@@ -1,1 +1,345 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Widget Diff Lab – Importer</title>
+    <style>
+      body {
+        margin: 0;
+        font: 14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        background: #f6f7f9;
+        color: #111;
+      }
+      header {
+        background: #fff;
+        border-bottom: 1px solid #e7e7e7;
+        padding: 12px 14px;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+      h1 { font-size: 16px; margin: 0 0 6px 0; }
+      .sub { color: #666; font-size: 12px; }
+      main { padding: 14px; display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
+      .card {
+        background: #fff;
+        border: 1px solid #e7e7e7;
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .cardHead {
+        padding: 10px 12px;
+        border-bottom: 1px solid #eee;
+        background: #fafafa;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .cardHead b { font-size: 13px; }
+      .cardBody { padding: 12px; }
+      textarea {
+        width: 100%;
+        min-height: 420px;
+        border: 1px solid #d2d2d2;
+        border-radius: 10px;
+        padding: 10px;
+        font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        resize: vertical;
+      }
+      input {
+        width: 100%;
+        height: 34px;
+        border: 1px solid #d2d2d2;
+        border-radius: 10px;
+        padding: 0 10px;
+        font: inherit;
+        background: #fff;
+      }
+      button {
+        height: 34px;
+        border: 1px solid #d2d2d2;
+        border-radius: 10px;
+        padding: 0 12px;
+        font: inherit;
+        background: #fff;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .row { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; }
+      .row3 { display: grid; gap: 10px; grid-template-columns: 1fr 1fr 1fr; }
+      .hint { color: #666; font-size: 12px; margin-top: 8px; }
+      pre {
+        margin: 0;
+        padding: 10px;
+        border: 1px solid #d2d2d2;
+        border-radius: 10px;
+        background: #fff;
+        font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        overflow: auto;
+        min-height: 420px;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      .bad { color: #b00020; font-weight: 600; }
+      .ok { color: #0b6b0b; font-weight: 600; }
+      @media (max-width: 1100px) {
+        main { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
 
+  <body>
+    <header>
+      <h1>Widget Diff Lab – Import from page source</h1>
+      <div class="sub">Paste full HTML source. Extracts: cssLinks, jsLinks (bit.js), templateHtml (header+main), widget attrs.</div>
+    </header>
+
+    <main>
+      <section class="card">
+        <div class="cardHead"><b>Input</b></div>
+        <div class="cardBody">
+          <div class="row3">
+            <div>
+              <div class="sub">Case key (filename)</div>
+              <input id="key" placeholder="gorillaz" />
+            </div>
+            <div>
+              <div class="sub">Label (dropdown)</div>
+              <input id="label" placeholder="Gorillaz Tour" />
+            </div>
+            <div>
+              <div class="sub">Site URL (reference)</div>
+              <input id="site" placeholder="https://gorillaz.com/tour/" />
+            </div>
+          </div>
+
+          <div style="height:10px"></div>
+
+          <textarea id="html" placeholder="Paste the full page source here..."></textarea>
+
+          <div style="display:flex; gap:10px; margin-top:10px; align-items:center;">
+            <button id="extractBtn">Extract</button>
+            <button id="copyCaseBtn">Copy case JSON</button>
+            <button id="copyIndexBtn">Copy index entry</button>
+            <div id="status" class="hint"></div>
+          </div>
+
+          <div class="hint">
+            Notes:
+            <ul>
+              <li>All http:// links are auto upgraded to https://.</li>
+              <li>Template is a minimal wrapper: header + main (or body fallback).</li>
+              <li>We keep only scripts that look like bit.js by default.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="cardHead"><b>Output</b></div>
+        <div class="cardBody">
+          <div class="row">
+            <div>
+              <div class="sub">Case JSON (paste into cases/&lt;key&gt;.json)</div>
+              <pre id="caseOut"></pre>
+            </div>
+            <div>
+              <div class="sub">Index entry (append into cases/index.json)</div>
+              <pre id="indexOut"></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const $ = (id) => document.getElementById(id);
+
+      function normHttps(url) {
+        if (!url) return url;
+        // upgrade http:// to https://
+        return url.replace(/^http:\/\//i, "https://");
+      }
+
+      function uniq(arr) {
+        return Array.from(new Set(arr.filter(Boolean)));
+      }
+
+      function pickCssLinks(doc) {
+        const links = Array.from(doc.querySelectorAll('link[rel="stylesheet"][href]'))
+          .map((l) => normHttps(l.getAttribute("href")))
+          .filter((h) => /^https?:\/\//i.test(h));
+        return uniq(links);
+      }
+
+      function pickBitJsLinks(doc) {
+        const scripts = Array.from(doc.querySelectorAll("script[src]"))
+          .map((s) => normHttps(s.getAttribute("src")))
+          .filter((src) => /^https?:\/\//i.test(src));
+
+        // Prefer scripts containing "bit.js" first, then "/bit" patterns
+        const bit = scripts.filter((s) => /\/bit(\.js)?/i.test(s) || /bit\.js/i.test(s));
+        return uniq(bit);
+      }
+
+      function pickBodyIdClass(doc) {
+        const body = doc.querySelector("body");
+        return {
+          bodyId: body && body.id ? body.id : "",
+          bodyClass: body && body.className ? body.className : ""
+        };
+      }
+
+      function extractTemplate(doc) {
+        const header = doc.querySelector("header");
+        const main = doc.querySelector("main");
+
+        const wrap = document.createElement("div");
+
+        if (header) wrap.appendChild(header.cloneNode(true));
+        if (main) wrap.appendChild(main.cloneNode(true));
+
+        // fallback: try section.tour or body content
+        if (!header && !main) {
+          const body = doc.querySelector("body");
+          if (body) {
+            const bodyClone = body.cloneNode(true);
+            // remove scripts to avoid duplicated execution
+            bodyClone.querySelectorAll("script").forEach((s) => s.remove());
+            // keep a light wrapper
+            wrap.appendChild(bodyClone);
+          }
+        }
+
+        // Ensure we have a slot for widget
+        // If the original widget exists, replace it with a slot container.
+        const existingInit = wrap.querySelector(".bit-widget-initializer");
+        if (existingInit) {
+          const slot = document.createElement("div");
+          slot.setAttribute("data-bit-slot", "1");
+          existingInit.replaceWith(slot);
+        } else {
+          // Add a default slot at end of main
+          const slot = document.createElement("div");
+          slot.setAttribute("data-bit-slot", "1");
+          wrap.appendChild(slot);
+        }
+
+        // Remove the widget script tag if present, runner will inject the right one (prod/stg)
+        wrap.querySelectorAll('script[src*="widgetv3"]').forEach((s) => s.remove());
+
+        // Upgrade any http image/src/href inside the template
+        wrap.querySelectorAll("[src]").forEach((el) => el.setAttribute("src", normHttps(el.getAttribute("src"))));
+        wrap.querySelectorAll("a[href]").forEach((el) => el.setAttribute("href", normHttps(el.getAttribute("href"))));
+
+        // Return as a single-line string (safe for JSON)
+        return wrap.innerHTML.replace(/\s+\n/g, "\n").trim();
+      }
+
+      function extractWidgetAttrs(doc) {
+        const a = doc.querySelector("a.bit-widget-initializer");
+        if (!a) return null;
+
+        const attrs = {};
+        Array.from(a.attributes).forEach((attr) => {
+          if (!attr.name.startsWith("data-")) return;
+
+          let v = attr.value || "";
+          // fix common typos
+          v = v.replace(/"ri$/i, ""); // rare copy artifact
+          // normalize rgba missing prefix (best-effort)
+          if (attr.name.toLowerCase().includes("color") && /^[0-9]+\s*,\s*[0-9]+\s*,\s*[0-9]+\s*,\s*[0-9.]+$/.test(v)) {
+            v = "rgba(" + v + ")";
+          }
+          attrs[attr.name] = v;
+        });
+
+        return attrs;
+      }
+
+      function setStatus(text, ok) {
+        $("status").innerHTML = ok ? `<span class="ok">${text}</span>` : `<span class="bad">${text}</span>`;
+      }
+
+      async function copy(text) {
+        await navigator.clipboard.writeText(text);
+      }
+
+      function extract() {
+        const key = $("key").value.trim();
+        const label = $("label").value.trim();
+        const site = $("site").value.trim();
+        const raw = $("html").value;
+
+        if (!key) return setStatus("Missing case key.", false);
+        if (!raw || raw.length < 50) return setStatus("Paste the page source HTML first.", false);
+
+        let doc;
+        try {
+          doc = new DOMParser().parseFromString(raw, "text/html");
+        } catch (e) {
+          return setStatus("Could not parse HTML.", false);
+        }
+
+        const cssLinks = pickCssLinks(doc);
+        const jsLinks = pickBitJsLinks(doc);
+        const { bodyId, bodyClass } = pickBodyIdClass(doc);
+        const templateHtml = extractTemplate(doc);
+        const attrs = extractWidgetAttrs(doc);
+
+        if (!attrs) {
+          setStatus("Could not find <a class=\"bit-widget-initializer\"> in the HTML.", false);
+        } else {
+          setStatus("Extracted successfully.", true);
+        }
+
+        const caseObj = {
+          key,
+          label: label || key,
+          site: site || "",
+          bodyId: bodyId || "",
+          bodyClass: bodyClass || "",
+          cssLinks,
+          jsLinks,
+          inlineCss: ".wrap{padding:0} .meta,.divider{display:none}",
+          templateHtml,
+          attrs: attrs || {},
+          notes: "Imported from page source"
+        };
+
+        // Clean empty fields
+        Object.keys(caseObj).forEach((k) => {
+          if (caseObj[k] === "" || (Array.isArray(caseObj[k]) && caseObj[k].length === 0)) delete caseObj[k];
+        });
+
+        const caseJson = JSON.stringify(caseObj, null, 2);
+        const indexEntry = JSON.stringify(
+          { key, label: label || key, file: `cases/${key}.json` },
+          null,
+          2
+        );
+
+        $("caseOut").textContent = caseJson;
+        $("indexOut").textContent = indexEntry;
+      }
+
+      $("extractBtn").addEventListener("click", extract);
+
+      $("copyCaseBtn").addEventListener("click", async () => {
+        const text = $("caseOut").textContent || "";
+        if (!text) return setStatus("Nothing to copy. Click Extract first.", false);
+        await copy(text);
+        setStatus("Copied case JSON.", true);
+      });
+
+      $("copyIndexBtn").addEventListener("click", async () => {
+        const text = $("indexOut").textContent || "";
+        if (!text) return setStatus("Nothing to copy. Click Extract first.", false);
+        await copy(text);
+        setStatus("Copied index entry.", true);
+      });
+    </script>
+  </body>
+</html>
