@@ -34,6 +34,11 @@
       "key": "turnpiketroubadours",
       "label": "Turnpike Troubadours Tour",
       "file": "cases/turnpiketroubadours.json"
+    },
+    {
+      "key": "thechicks",
+      "label": "The Chicks Tour",
+      "file": "cases/thechicks.json"
     }
   ]
 }
