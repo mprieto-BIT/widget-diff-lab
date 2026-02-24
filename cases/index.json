@@ -29,6 +29,11 @@
       "key": "impoppy",
       "label": "Poppy Tour",
       "file": "cases/impoppy.json"
+    },
+    {
+      "key": "turnpiketroubadours",
+      "label": "Turnpike Troubadours Tour",
+      "file": "cases/turnpiketroubadours.json"
     }
   ]
 }
