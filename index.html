@@ -191,15 +191,16 @@
       }
 
       async function init() {
-        const res = await fetch("./cases.json", { cache: "no-store" });
-        cases = await res.json();
+        const res = await fetch("./cases/index.json", { cache: "no-store" });
+        const idx = await res.json();
+        cases = idx.cases || [];
 
         els.caseSelect.innerHTML = "";
         cases.forEach((c) => {
-          const opt = document.createElement("option");
-          opt.value = c.key;
-          opt.textContent = c.label;
-          els.caseSelect.appendChild(opt);
+        const opt = document.createElement("option");
+        opt.value = c.key;
+        opt.textContent = c.label;
+        els.caseSelect.appendChild(opt);
         });
 
         applyLayout();
