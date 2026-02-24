@@ -101,6 +101,7 @@
         </select>
 
         <div class="spacer"></div>
+        <button id="importerBtn">Importer</button>
         <button id="reloadBtn">Reload</button>
       </div>
       <div class="hint" id="hint"></div>
@@ -139,6 +140,7 @@
         caseSelect: document.getElementById("caseSelect"),
         layoutSelect: document.getElementById("layoutSelect"),
         vpSelect: document.getElementById("vpSelect"),
+        importerBtn: document.getElementById("importerBtn"),
         reloadBtn: document.getElementById("reloadBtn"),
         hint: document.getElementById("hint"),
         grid: document.getElementById("grid"),
@@ -222,6 +224,10 @@ fetch("./" + entry.file + "?_t=" + Date.now(), { cache: "no-store" })
         els.layoutSelect.addEventListener("change", () => { applyLayout(); });
         els.vpSelect.addEventListener("change", () => { applyViewport(); });
         els.reloadBtn.addEventListener("click", loadFrames);
+       
+        els.importerBtn.addEventListener("click", () => {
+          window.open("./importer.html", "_blank", "noopener");
+        });
       }
 
       init().catch((e) => {
