@@ -24,6 +24,11 @@
       "key": "robzombie",
       "label": "Rob Zombie Tour",
      "file": "cases/robzombie.json"
+    },
+    {
+     "key": "treatyoakrevival",
+     "label": "Treaty Oak Revival Tour",
+     "file": "cases/treatyoakrevival.json"
     }
   ]
 }
