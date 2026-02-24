@@ -2,20 +2,18 @@
   "key": "gorillaz",
   "label": "Gorillaz Tour",
   "site": "https://gorillaz.com/tour/",
-  "layout": "twoColumnPoster",
-  "posterUrl": "https://gorillaz.com/wp-content/themes/gorillaz/assets/IMG/admat-portrait-v01.jpg",
   "bodyId": "tour",
   "cssLinks": [
-  "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css",
-  "https://use.typekit.net/wwr0zzw.css",
-  "https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap",
-  "https://gorillaz.com/wp-content/themes/gorillaz/assets/CSS/style.css?v=1771942060"
-],
-  "templateHtml": "<body id=\"tour\"><header><a href=\"https://gorillaz.com/\" id=\"header-logo\"><img src=\"https://gorillaz.com/wp-content/themes/gorillaz/assets/IMG/gorillaz-logo.png\" alt=\"Gorillaz\" /></a><nav><a href=\"https://gorillaz.com/tour/\" class=\"link\">Tour</a><a href=\"https://gorillaz.lnk.to/shopWE\" target=\"_blank\" class=\"link\">Store</a><a href=\"https://kongstudios.gorillaz.com\" target=\"_blank\" class=\"link\">Kong Studios</a><a href=\"https://gorillaz.com/#sign-up\" class=\"link nav-link\">Sign Up</a></nav></header><main><section class=\"tour\"><div class=\"columns\"><img class=\"poster\" src=\"https://gorillaz.com/wp-content/themes/gorillaz/assets/IMG/admat-portrait-v01.jpg\" alt=\"Gorillaz Tour Poster\" /><div data-bit-slot></div></div></section></main></body>",
+    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css",
+    "https://use.typekit.net/wwr0zzw.css",
+    "https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap",
+    "https://gorillaz.com/wp-content/themes/gorillaz/assets/CSS/style.css?v=1771942060"
+  ],
   "jsLinks": [
-  "https://gorillaz.com/wp-content/themes/gorillaz/assets/JS/bit.js?v=1771942060"
-],
-  "inlineCss": ".wrap{padding:0} .meta,.divider{display:none}"
+    "https://gorillaz.com/wp-content/themes/gorillaz/assets/JS/bit.js?v=1771942060"
+  ],
+  "inlineCss": ".wrap{padding:0} .meta,.divider{display:none}",
+  "templateHtml": "<header><a href=\"https://gorillaz.com/\" id=\"header-logo\"><img src=\"https://gorillaz.com/wp-content/themes/gorillaz/assets/IMG/gorillaz-logo.png\" alt=\"Gorillaz\" /></a><nav><a href=\"https://gorillaz.com/tour/\" class=\"link\">Tour</a><a href=\"https://gorillaz.lnk.to/shopWE\" target=\"_blank\" class=\"link\">Store</a><a href=\"https://kongstudios.gorillaz.com\" target=\"_blank\" class=\"link\">Kong Studios</a><a href=\"https://gorillaz.com/#sign-up\" class=\"link nav-link\">Sign Up</a></nav></header><main><section class=\"tour\"><div class=\"columns\"><img class=\"poster\" src=\"https://gorillaz.com/wp-content/themes/gorillaz/assets/IMG/admat-portrait-v01.jpg\" alt=\"Gorillaz Tour Poster\" /><div data-bit-slot></div></div></section></main>",
   "attrs": {
     "data-artist-name": "id_132",
     "data-events-to-hide": "107649214,107649215,107649216,107649217,107649218,107649219,107649220,107649221,107649222,107649223,107649224,107649225,107649226,107649227,107649228,107649229,107649230,107649231,107649232,107649233,107649234,107649235",
@@ -86,5 +84,5 @@
     "data-bit-logo-position": "hidden",
     "data-bit-logo-color": "rgba(247,244,239,1)"
   },
-  "notes": "Loads Gorillaz site CSS + poster layout to match their real page styling."
+  "notes": "Real wrapper + site CSS + bit.js. Closest match to gorillaz.com/tour."
 }
