@@ -62,9 +62,17 @@
             ? "https://widgetv3.stg.bandsintown.com/main.min.js"
             : "https://widgetv3.bandsintown.com/main.min.js";
 
-        const res = await fetch("./cases.json", { cache: "no-store" });
-        const cases = await res.json();
-        const found = cases.find((c) => c.key === key);
+        const idxRes = await fetch("./cases/index.json", { cache: "no-store" });
+        const idx = await idxRes.json();
+        const entry = (idx.cases || []).find((c) => c.key === key);
+
+        if (!entry || !entry.file) {
+        setMeta(`Missing case entry: <b>${key}</b>`);
+        return;
+        }
+
+        const caseRes = await fetch("./" + entry.file, { cache: "no-store" });
+        const found = await caseRes.json();
 
         if (!found) {
           setMeta(`Missing case: <b>${key}</b>`);
