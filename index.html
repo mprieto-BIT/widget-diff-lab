@@ -1,1 +1,220 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Widget Diff Lab</title>
+    <style>
+      :root { color-scheme: light; }
+      body {
+        margin: 0;
+        font: 14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        color: #111;
+        background: #f6f7f9;
+      }
+      header {
+        position: sticky;
+        top: 0;
+        background: #fff;
+        border-bottom: 1px solid #e7e7e7;
+        padding: 12px 14px;
+        z-index: 10;
+      }
+      .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+      .row label { font-weight: 600; }
+      select, button {
+        height: 34px;
+        border: 1px solid #d2d2d2;
+        border-radius: 8px;
+        background: #fff;
+        padding: 0 10px;
+        font: inherit;
+      }
+      button { cursor: pointer; }
+      .spacer { flex: 1; }
+      .hint { color: #666; font-size: 12px; margin-top: 6px; }
 
+      main { padding: 12px 12px 18px 12px; }
+
+      .grid {
+        display: grid;
+        gap: 12px;
+      }
+      .grid.side { grid-template-columns: 1fr 1fr; }
+      .grid.stack { grid-template-columns: 1fr; }
+
+      .pane {
+        background: #fff;
+        border: 1px solid #e7e7e7;
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .paneHead {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 12px;
+        border-bottom: 1px solid #eee;
+        background: #fafafa;
+      }
+      .paneHead b { font-size: 13px; }
+      .paneHead a { color: #555; text-decoration: none; font-size: 12px; }
+      .frameWrap { padding: 0; }
+      iframe {
+        width: 100%;
+        border: 0;
+        display: block;
+        background: #fff;
+      }
+
+      .w-desktop { width: 1200px; max-width: 100%; }
+      .w-tablet { width: 800px; max-width: 100%; }
+      .w-mobile { width: 390px; max-width: 100%; }
+
+      .frameSizer {
+        margin: 12px auto;
+        border: 1px dashed #d6d6d6;
+        border-radius: 10px;
+        overflow: hidden;
+        background: #fff;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <div class="row">
+        <label for="caseSelect">Case</label>
+        <select id="caseSelect"></select>
+
+        <label for="layoutSelect">Layout</label>
+        <select id="layoutSelect">
+          <option value="side">Side by side</option>
+          <option value="stack">Stacked</option>
+        </select>
+
+        <label for="vpSelect">Viewport</label>
+        <select id="vpSelect">
+          <option value="desktop">Desktop (1200)</option>
+          <option value="tablet">Tablet (800)</option>
+          <option value="mobile">Mobile (390)</option>
+        </select>
+
+        <div class="spacer"></div>
+        <button id="reloadBtn">Reload</button>
+      </div>
+      <div class="hint" id="hint"></div>
+    </header>
+
+    <main>
+      <div id="grid" class="grid side">
+        <div class="pane">
+          <div class="paneHead">
+            <b>PROD</b>
+            <a id="prodLink" target="_blank" rel="noopener">Open runner</a>
+          </div>
+          <div class="frameWrap">
+            <div id="prodSizer" class="frameSizer w-desktop">
+              <iframe id="prodFrame" height="1400" loading="lazy"></iframe>
+            </div>
+          </div>
+        </div>
+
+        <div class="pane">
+          <div class="paneHead">
+            <b>STG</b>
+            <a id="stgLink" target="_blank" rel="noopener">Open runner</a>
+          </div>
+          <div class="frameWrap">
+            <div id="stgSizer" class="frameSizer w-desktop">
+              <iframe id="stgFrame" height="1400" loading="lazy"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      const els = {
+        caseSelect: document.getElementById("caseSelect"),
+        layoutSelect: document.getElementById("layoutSelect"),
+        vpSelect: document.getElementById("vpSelect"),
+        reloadBtn: document.getElementById("reloadBtn"),
+        hint: document.getElementById("hint"),
+        grid: document.getElementById("grid"),
+        prodFrame: document.getElementById("prodFrame"),
+        stgFrame: document.getElementById("stgFrame"),
+        prodSizer: document.getElementById("prodSizer"),
+        stgSizer: document.getElementById("stgSizer"),
+        prodLink: document.getElementById("prodLink"),
+        stgLink: document.getElementById("stgLink")
+      };
+
+      let cases = [];
+
+      function runnerUrl(env, key) {
+        const u = new URL("./runner.html", location.href);
+        u.searchParams.set("env", env);
+        u.searchParams.set("case", key);
+        u.searchParams.set("_t", String(Date.now()));
+        return u.toString();
+      }
+
+      function applyLayout() {
+        const v = els.layoutSelect.value;
+        els.grid.className = "grid " + (v === "stack" ? "stack" : "side");
+      }
+
+      function applyViewport() {
+        const v = els.vpSelect.value;
+        const cls = v === "mobile" ? "w-mobile" : v === "tablet" ? "w-tablet" : "w-desktop";
+        els.prodSizer.className = "frameSizer " + cls;
+        els.stgSizer.className = "frameSizer " + cls;
+      }
+
+      function loadFrames() {
+        const key = els.caseSelect.value;
+        const found = cases.find((c) => c.key === key);
+
+        els.hint.textContent = found
+          ? `Site reference: ${found.site}. Notes: ${found.notes || ""}`
+          : "";
+
+        const prod = runnerUrl("prod", key);
+        const stg = runnerUrl("stg", key);
+
+        els.prodFrame.src = prod;
+        els.stgFrame.src = stg;
+
+        els.prodLink.href = prod;
+        els.stgLink.href = stg;
+      }
+
+      async function init() {
+        const res = await fetch("./cases.json", { cache: "no-store" });
+        cases = await res.json();
+
+        els.caseSelect.innerHTML = "";
+        cases.forEach((c) => {
+          const opt = document.createElement("option");
+          opt.value = c.key;
+          opt.textContent = c.label;
+          els.caseSelect.appendChild(opt);
+        });
+
+        applyLayout();
+        applyViewport();
+        loadFrames();
+
+        els.caseSelect.addEventListener("change", loadFrames);
+        els.layoutSelect.addEventListener("change", () => { applyLayout(); });
+        els.vpSelect.addEventListener("change", () => { applyViewport(); });
+        els.reloadBtn.addEventListener("click", loadFrames);
+      }
+
+      init().catch((e) => {
+        els.hint.textContent = "Init error: " + String(e && e.message ? e.message : e);
+      });
+    </script>
+  </body>
+</html>
