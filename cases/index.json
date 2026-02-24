@@ -19,6 +19,11 @@
       "key": "fivefingerdeathpunch",
       "label": "Five Finger Death Punch Tour",
       "file": "cases/fivefingerdeathpunch.json"
+    },
+    {
+      "key": "robzombie",
+      "label": "Rob Zombie Tour",
+     "file": "cases/robzombie.json"
     }
   ]
 }
