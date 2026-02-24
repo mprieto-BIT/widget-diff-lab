@@ -26,9 +26,9 @@
      "file": "cases/robzombie.json"
     },
     {
-     "key": "treatyoakrevival",
-     "label": "Treaty Oak Revival Tour",
-     "file": "cases/treatyoakrevival.json"
+      "key": "impoppy",
+      "label": "Poppy Tour",
+      "file": "cases/impoppy.json"
     }
   ]
 }
