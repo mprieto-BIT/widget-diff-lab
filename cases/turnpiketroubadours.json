@@ -11,7 +11,7 @@
     "https://turnpiketroubadours.com/wp-content/uploads/elementor/css/post-6.css?ver=1770741204",
     "https://turnpiketroubadours.com/wp-content/uploads/premium-addons-elementor/pafe-1547.css?ver=1752065484"
   ],
-  "inlineCss": "html,body{height:100%} body{margin:0} .wrap{min-height:100vh; display:flex; flex-direction:column} .hero{min-height:60vh; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding:80px 24px 24px} .hero h1{margin:0; padding:24px 0 0; text-align:center} .tour{width:100%; max-width:1100px; margin:32px auto 80px; padding:0 24px} .bit-placeholder{width:100%}",
+  "inlineCss": "html,body{margin:0;padding:0} body{background:#22310b} .page{min-height:100vh;width:100%} .bit-slot{width:100%;max-width:none;margin:0 auto;padding:0 48px;box-sizing:border-box} .bit-slot *{box-sizing:border-box}",
   "templateHtml": "<div class=\"wrap\">\n  <div class=\"hero\">\n    <div style=\"height:260px\"></div>\n    <div style=\"text-align:center; margin-top:12px\">\n      <div style=\"font-weight:700; letter-spacing:1px; text-transform:uppercase\">NEW ALBUM \"THE PRICE OF ADMISSION\"</div>\n      <div style=\"margin-top:8px; font-weight:700; letter-spacing:1px; text-transform:uppercase\">AVAILABLE NOW</div>\n      <a href=\"https://orcd.co/tpttpoa\" target=\"_blank\" rel=\"noopener\" style=\"display:inline-block; margin-top:18px; padding:12px 22px; border-radius:22px; background:#ff8103; color:#000; text-decoration:none; font-weight:800; text-transform:uppercase\">STREAM / PURCHASE</a>\n    </div>\n  </div>\n\n  <div class=\"tour\" id=\"tour\">\n    <div class=\"bit-placeholder\" data-bit-slot=\"1\"></div>\n  </div>\n</div>",
   "attrs": {
     "data-artist-name": "id_1056548",
