@@ -1,1 +1,14 @@
-
+{
+  "cases": [
+    {
+      "key": "jeffallencomedy",
+      "label": "Jeff Allen Comedy",
+      "file": "cases/jeffallencomedy.json"
+    },
+    {
+      "key": "gorillaz",
+      "label": "Gorillaz Tour",
+      "file": "cases/gorillaz.json"
+    }
+  ]
+}
