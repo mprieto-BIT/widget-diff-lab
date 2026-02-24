@@ -9,6 +9,11 @@
       "key": "gorillaz",
       "label": "Gorillaz Tour",
       "file": "cases/gorillaz.json"
+    }, 
+    {
+      "key": "alexandrakay",
+      "label": "Alexandra Kay Tour",
+      "file": "cases/alexandrakay.json"
     }
   ]
 }
