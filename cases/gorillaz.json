@@ -10,6 +10,11 @@
     "https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap",
     "https://gorillaz.com/wp-content/themes/gorillaz/assets/CSS/style.css"
   ],
+  "templateHtml": "<header class=\"bitlab-header\"><a href=\"/\" id=\"header-logo\">Gorillaz</a><nav><a class=\"link\">Tour</a><a class=\"link\">Store</a><a class=\"link\">Kong Studios</a><a class=\"link\">Sign Up</a></nav></header><main><section class=\"tour\"><div class=\"columns\"><img class=\"poster\" src=\"https://gorillaz.com/wp-content/themes/gorillaz/assets/IMG/admat-portrait-v01.jpg\" alt=\"Gorillaz Tour Poster\" /><div data-bit-slot></div></div></section></main>",
+  "jsLinks": [
+  "https://gorillaz.com/wp-content/themes/gorillaz/assets/JS/bit.js?v=1771942060"
+],
+  "inlineCss": "body{margin:0} .wrap{padding:0} .meta,.divider{display:none} .bitlab-header{display:flex;align-items:center;justify-content:space-between;padding:24px} .bitlab-header nav{display:flex;gap:24px} .bitlab-header a{color:#000;text-decoration:none;font-weight:700} "
   "inlineCss": "body{background:#000} .wrap{padding:0} .meta,.divider{display:none} .case-two-col{padding:0 24px}",
   "attrs": {
     "data-artist-name": "id_132",
