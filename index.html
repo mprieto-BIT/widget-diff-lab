@@ -174,11 +174,22 @@
 
       function loadFrames() {
         const key = els.caseSelect.value;
-        const found = cases.find((c) => c.key === key);
+        const entry = cases.find((c) => c.key === key);
 
-        els.hint.textContent = found
-          ? `Site reference: ${found.site}. Notes: ${found.notes || ""}`
-          : "";
+if (!entry) {
+  els.hint.textContent = "";
+  return;
+}
+
+fetch("./" + entry.file + "?_t=" + Date.now(), { cache: "no-store" })
+  .then((r) => r.json())
+  .then((detail) => {
+    els.hint.textContent =
+      `Site reference: ${detail.site || ""}. Notes: ${detail.notes || ""}`.trim();
+  })
+  .catch(() => {
+    els.hint.textContent = "Site reference: (failed to load case details)";
+  });
 
         const prod = runnerUrl("prod", key);
         const stg = runnerUrl("stg", key);
