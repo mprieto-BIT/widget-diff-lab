@@ -156,7 +156,7 @@
         const u = new URL("./runner.html", location.href);
         u.searchParams.set("env", env);
         u.searchParams.set("case", key);
-        u.searchParams.set("_t", String(Date.now()));
+        u.searchParams.set("_t", String(Date.now()) + "-" + Math.random().toString(16).slice(2));
         return u.toString();
       }
 
