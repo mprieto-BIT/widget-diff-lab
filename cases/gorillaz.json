@@ -16,6 +16,7 @@
   "templateHtml": "<header><a href=\"https://gorillaz.com/\" id=\"header-logo\"><img src=\"https://gorillaz.com/wp-content/themes/gorillaz/assets/IMG/gorillaz-logo.png\" alt=\"Gorillaz\" /></a><nav><a href=\"https://gorillaz.com/tour/\" class=\"link\">Tour</a><a href=\"https://gorillaz.lnk.to/shopWE\" target=\"_blank\" class=\"link\">Store</a><a href=\"https://kongstudios.gorillaz.com\" target=\"_blank\" class=\"link\">Kong Studios</a><a href=\"https://gorillaz.com/#sign-up\" class=\"link nav-link\">Sign Up</a></nav></header><main><section class=\"tour\"><div class=\"columns\"><img class=\"poster\" src=\"https://gorillaz.com/wp-content/themes/gorillaz/assets/IMG/admat-portrait-v01.jpg\" alt=\"Gorillaz Tour Poster\" /><div data-bit-slot></div></div></section></main>",
   "attrs": {
     "data-artist-name": "id_132",
+    "data-layout-style=": "classic",
     "data-events-to-hide": "107649214,107649215,107649216,107649217,107649218,107649219,107649220,107649221,107649222,107649223,107649224,107649225,107649226,107649227,107649228,107649229,107649230,107649231,107649232,107649233,107649234,107649235",
     "data-events-to-display": "",
     "data-background-color": "rgba(0,0,0,1)",
